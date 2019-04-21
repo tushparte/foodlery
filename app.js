@@ -6,6 +6,7 @@ const session = require('express-session');
 const bcrypt = require('bcryptjs');
 // Load User model
 const User = require('./models/User');
+const Restaurant = require('./models/restaurant')
 const { ensureAuthenticated, forwardAuthenticated } = require('./config/auth');
 
 
@@ -13,6 +14,7 @@ const app = express();
 
 // Passport Config
 require('./config/passport')(passport);
+//require('./config/restaurantpassport')(passport);
 
 // Connect to MongoDB
 mongoose
@@ -140,9 +142,99 @@ app.get('/login', (req, res) => {
 
 // Login
 app.post('/login', (req, res, next) => {
-  passport.authenticate('local', {
+  passport.authenticate('user-local', {
     successRedirect: '/secret',
     failureRedirect: '/login',
+    failureFlash: true
+  })(req, res, next);
+});
+
+//Restaurant Routes
+
+app.get('/registerrestaurant', (req, res) => {
+  res.render('registerrestaurant', {currentUser: req.user});
+});
+
+app.post('/registerrestaurant', (req, res) => {
+  const { name, email, password, password2, contact, city} = req.body;
+  let errors = [];
+
+  if (!name || !email || !password || !password2) {
+    errors.push({ msg: 'Please enter all fields' });
+  }
+
+  if (password != password2) {
+    errors.push({ msg: 'Passwords do not match' });
+  }
+
+  if (password.length < 6) {
+    errors.push({ msg: 'Password must be at least 6 characters' });
+  }
+
+  if (errors.length > 0) {
+    console.log(errors);
+    res.render('registerrestaurant', {
+      errors,
+      name,
+      email,
+      password,
+      password2,
+      contact,
+      city,
+      currentUser: req.user
+    });
+  } else {
+    Restaurant.findOne({ email: email }).then(restaurant => {
+      if (restaurant) {
+        errors.push({ msg: 'Email already exists' });
+        res.render('register', {
+          errors,
+          name,
+          email,
+          password,
+          password2,
+          contact,
+          city
+        });
+      } else {
+        const newRestaurant = new Restaurant({
+          name,
+          email,
+          password,
+          contact,
+          city
+        });
+
+        bcrypt.genSalt(10, (err, salt) => {
+          bcrypt.hash(newRestaurant.password, salt, (err, hash) => {
+            if (err) throw err;
+            newRestaurant.password = hash;
+            newRestaurant
+              .save()
+              .then(user => {
+                req.flash(
+                  'success_msg',
+                  'You are now registered and can log in'
+                );
+                console.log(newRestaurant);
+                res.redirect('/loginrestaurant');
+              })
+              .catch(err => console.log(err));
+          });
+        });
+      }
+    });
+  }
+});
+
+app.get('/loginrestaurant', (req, res) => {
+  res.render('loginrestaurant', {currentUser: req.user});
+});
+
+app.post('/loginrestaurant', (req, res, next) => {
+  passport.authenticate('restaurant-local', {
+    successRedirect: '/secret',
+    failureRedirect: '/loginrestaurant',
     failureFlash: true
   })(req, res, next);
 });

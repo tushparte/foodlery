@@ -1,11 +1,36 @@
-<h1>Sign up Form</h1>
-
-<form action="/registerrestaurant" method="POST">
-    <input type="text" name="username" placeholder="username">
-    <input type="password" name="password" placeholder="password">
-    <button>Submit</button>
-</form>
-
-<li><a href="/registerrestaurant">Sign Up!</a></li>
-<li><a href="/loginrestaurant">Login!</a></li>
-<li><a href="/logout">Logout!</a></li>
+<% include ./partials/header %>
+<div class="container">
+    <h1>Register Your Restaurant</h1>
+</div>
+<div class="page-wrap container">
+    <% include ./partials/messages %>
+    <form action="/registerrestaurant" method="POST">
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input  id="name" class="form-control" type="text" name="name" placeholder="Enter Name">
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input id="email" class="form-control" type="text" name="email" placeholder="Enter Email">
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input id="password" class="form-control" type="password" name="password" placeholder="Enter Password">
+        </div>
+        <div class="form-group">
+            <label for="password2">Password</label>
+            <input id="password2" class="form-control" type="password" name="password2" placeholder="Confirm Password">
+        </div>
+        <div class="form-group">
+            <label for="contact">Phone Number</label>
+            <input id="contact" class="form-control" type="text" name="contact" placeholder="Enter Phone Number">
+        </div>
+        <div class="form-group">
+            <label for="city">City</label>
+            <input id="city" class="form-control" type="text" name="city" placeholder="Enter City">
+        </div>
+        <br>
+        <button class="btn btn-success" type="submit">Submit</button>
+    </form>
+</div>
+<% include ./partials/footer %>

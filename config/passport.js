@@ -4,9 +4,10 @@ const bcrypt = require('bcryptjs');
 
 // Load User model
 const User = require('../models/User');
+const Restaurant = require('../models/restaurant');
 
 module.exports = function(passport) {
-  passport.use(
+  passport.use("user-local",
     new LocalStrategy({ usernameField: 'email' }, (email, password, done) => {
       // Match user
       User.findOne({
@@ -29,13 +30,43 @@ module.exports = function(passport) {
     })
   );
 
+  passport.use('restaurant-local',
+    new LocalStrategy({ usernameField: 'email' }, (email, password, done) => {
+      // Match user
+      Restaurant.findOne({
+        email: email
+      }).then(restaurant => {
+        if (!restaurant) {
+          return done(null, false, { message: 'That email is not registered' });
+        }
+
+        // Match password
+        bcrypt.compare(password, restaurant.password, (err, isMatch) => {
+          if (err) throw err;
+          if (isMatch) {
+            return done(null, restaurant);
+          } else {
+            return done(null, false, { message: 'Password incorrect' });
+          }
+        });
+      });
+    })
+  );
+  //need to generalize below for both strategies(User model and Resteraunt model)
+
   passport.serializeUser(function(user, done) {
     done(null, user.id);
   });
 
   passport.deserializeUser(function(id, done) {
     User.findById(id, function(err, user) {
-      done(err, user);
+      if(!user){
+        Restaurant.findById(id, function(err, user) {
+          done(err,user);
+        });
+      }else{
+        done(err, user);
+      }
     });
   });
 };
