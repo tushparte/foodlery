@@ -66,7 +66,7 @@ app.get('/register', forwardAuthenticated, (req, res) => {
 });
 
 app.post('/register', (req, res) => {
-  const { name, email, password, password2 } = req.body;
+  const { name, email, password, password2, contact, city } = req.body;
   let errors = [];
 
   if (!name || !email || !password || !password2) {
@@ -99,13 +99,17 @@ app.post('/register', (req, res) => {
           name,
           email,
           password,
-          password2
+          password2,
+          contact,
+          city
         });
       } else {
         const newUser = new User({
           name,
           email,
-          password
+          password,
+          contact,
+          city
         });
 
         bcrypt.genSalt(10, (err, salt) => {
@@ -119,6 +123,7 @@ app.post('/register', (req, res) => {
                   'success_msg',
                   'You are now registered and can log in'
                 );
+                console.log(newUser);
                 res.redirect('/login');
               })
               .catch(err => console.log(err));
