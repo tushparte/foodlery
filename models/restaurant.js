@@ -24,7 +24,13 @@ const RestaurantSchema = new mongoose.Schema({
   date: {
     type: Date,
     default: Date.now
-  }
+  },
+  img: String,
+  description: String,
+  menu: [{
+    dish: String,
+    price: String
+  }]
 });
 
 const Restaurant = mongoose.model('Restaurant', RestaurantSchema);

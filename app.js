@@ -7,7 +7,7 @@ const bcrypt = require('bcryptjs');
 // Load User model
 const User = require('./models/User');
 const Restaurant = require('./models/restaurant')
-const { ensureAuthenticated, forwardAuthenticated } = require('./config/auth');
+const { ensureAuthenticated, forwardAuthenticated, restAuthenticate} = require('./config/auth');
 
 
 const app = express();
@@ -57,7 +57,7 @@ app.use(function(req, res, next) {
 
 // Routes
 // Welcome Page
-app.get('/', forwardAuthenticated, (req, res) => res.render('home', {currentUser: req.user}));
+app.get('/', (req, res) => res.render('home', {currentUser: req.user}));
 
 app.get('/secret', ensureAuthenticated, (req, res) => {
   res.render('secret', {currentUser: req.user});
@@ -233,17 +233,51 @@ app.get('/loginrestaurant', (req, res) => {
 
 app.post('/loginrestaurant', (req, res, next) => {
   passport.authenticate('restaurant-local', {
-    successRedirect: '/secret',
+    successRedirect: '/myrestaurant',
     failureRedirect: '/loginrestaurant',
     failureFlash: true
   })(req, res, next);
+});
+
+app.get('/restaurant', (req, res) => {
+  res.render('restaurant', {currentUser: req.user});
+});
+
+app.get('/restaurants', (req, res) => {
+  Restaurant.find({}, (err, allRestaurants) => {
+    if(err) {
+      console.log(err);
+    } else {
+      res.render('restaurants/index', {
+        allRestaurants: allRestaurants,
+        currentUser: req.user
+      });
+    }
+  });
+});
+
+app.get('/restaurants/:id', (req, res) => {
+  Restaurant.findById(req.params.id, (err, result) => {
+    if(err) {
+      console.log(err);
+    } else {
+      //res.send(result);
+      //console.log(result.name);
+      res.render('restaurants/show', {allRestaurants: result, currentUser: req.user});
+      //res.render('home', {currentUser: req.user});
+    }
+  });
+});
+
+app.get('/myrestaurant', restAuthenticate, (req, res) => {
+  res.render('restaurants/me', {currentUser: req.user});
 });
 
 // Logout
 app.get('/logout', (req, res) => {
   req.logout();
   req.flash('success_msg', 'You are logged out');
-  res.redirect('/login');
+  res.redirect('/');
 });
 
 

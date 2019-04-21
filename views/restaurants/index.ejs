@@ -1,0 +1,8 @@
+<% include ../partials/header %>
+    <h1>Restaurants Near You</h1>
+    <ul>
+        <% allRestaurants.forEach((restaurant)=> { %>
+        <li><a href="/restaurants/<%=restaurant._id%>" > <%=restaurant.name%> </a></li>
+        <% }); %>
+    </ul>
+<% include ../partials/footer %>
