@@ -30,6 +30,7 @@ app.set('view engine', 'ejs');
 
 // Express body parser
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static(__dirname + "/public"));
 
 // Express session
 app.use(
@@ -271,6 +272,10 @@ app.get('/restaurants/:id', (req, res) => {
 
 app.get('/myrestaurant', restAuthenticate, (req, res) => {
   res.render('restaurants/me', {currentUser: req.user});
+});
+
+app.get('/editprofile', restAuthenticate, (req, res) => {
+  res.render('restaurants/editform', {currentUser: req.user});
 });
 
 // Logout
