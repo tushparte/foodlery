@@ -61,6 +61,10 @@ app.use(function(req, res, next) {
 // Welcome Page
 app.get('/', (req, res) => res.render('home', {currentUser: req.user}));
 
+app.get('/myprofile', (req, res) => {
+  res.render('myprofile', {currentUser: req.user});
+});
+
 app.get('/secret', ensureAuthenticated, (req, res) => {
   res.render('secret', {currentUser: req.user});
 });
@@ -145,7 +149,7 @@ app.get('/login', (req, res) => {
 // Login
 app.post('/login', (req, res, next) => {
   passport.authenticate('user-local', {
-    successRedirect: '/secret',
+    successRedirect: '/myprofile',
     failureRedirect: '/login',
     failureFlash: true
   })(req, res, next);
@@ -270,7 +274,7 @@ app.get('/restaurants/:id', (req, res) => {
   });
 });
 
-app.post('/restaurants/:id/reviews', (req, res) => {
+app.post('/restaurants/:id/reviews', ensureAuthenticated, (req, res) => {
   Restaurant.findById(req.params.id, (err, restaurant) => {
     if(err){
       console.log(err);
@@ -280,8 +284,12 @@ app.post('/restaurants/:id/reviews', (req, res) => {
         if(err) {
           console.log(err);
         } else {
+          review.author.id = req.user._id;
+          review.author.name = req.user.name;
+          review.save();
           restaurant.reviews.push(review);
           restaurant.save();
+          console.log(review);
           res.redirect('/restaurants/' + restaurant._id);
         }
       });

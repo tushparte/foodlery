@@ -13,19 +13,17 @@
               <% include ../partials/messages %>
               <form action="/restaurants/<%= restaurant._id %>/reviews" method="POST">
                   <div class="form-group">
-                      <label for="author">Author</label>
-                      <input id="author" class="form-control" type="text" name="review[author]" placeholder="Author">
-                  </div>
-                  <div class="form-group">
                       <label for="text">Name</label>
                       <input  id="text" class="form-control" type="text" name="review[text]" placeholder="Review <%=restaurant.name%>">
                   </div>
                   <button class="btn btn-success" type="submit">Submit</button>
                   <br>
               </form>
-        <% restaurant.reviews.forEach((review) => { %>
-          <p class="lead"> <strong><%= review.author %></strong> - <%= review.text %></p>
-        <% }); %>
+        <div class="well">
+          <% restaurant.reviews.forEach((review) => { %>
+            <p class="lead"> <strong><%= review.author.name %></strong> - <%= review.text %></p>
+          <% }); %>
+        </div>
       </div>
     </div>
 
