@@ -1,4 +1,32 @@
 <% include ../partials/header %>
-    <h1>Restaurants Near You</h1>
-    
+    <div class="container">
+      <div class="jumbotron">
+        <h2 class="display-4">BBQ Nation Allahabad</h2>
+        <div class="container img">
+          <img src="https://www.bbcgoodfood.com/sites/default/files/guide/guide-image/2012/08/how-to-barbecue-safely-main-image-700-350.jpg" alt="">
+        </div>
+    </div>
+    <h1 class="display-6">About</h1>
+    <p class="lead">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+    <h1 class="display-6">Reviews</h1>
+      <div class="container">
+              <% include ../partials/messages %>
+              <form action="/restaurants/<%= restaurant._id %>/reviews" method="POST">
+                  <div class="form-group">
+                      <label for="author">Author</label>
+                      <input id="author" class="form-control" type="text" name="review[author]" placeholder="Author">
+                  </div>
+                  <div class="form-group">
+                      <label for="text">Name</label>
+                      <input  id="text" class="form-control" type="text" name="review[text]" placeholder="Review <%=restaurant.name%>">
+                  </div>
+                  <button class="btn btn-success" type="submit">Submit</button>
+                  <br>
+              </form>
+        <% restaurant.reviews.forEach((review) => { %>
+          <p class="lead"> <strong><%= review.author %></strong> - <%= review.text %></p>
+        <% }); %>
+      </div>
+    </div>
+
 <% include ../partials/footer %>

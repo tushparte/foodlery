@@ -7,6 +7,7 @@ const bcrypt = require('bcryptjs');
 // Load User model
 const User = require('./models/User');
 const Restaurant = require('./models/restaurant')
+const Review = require('./models/review');
 const { ensureAuthenticated, forwardAuthenticated, restAuthenticate} = require('./config/auth');
 
 
@@ -258,14 +259,32 @@ app.get('/restaurants', (req, res) => {
 });
 
 app.get('/restaurants/:id', (req, res) => {
-  Restaurant.findById(req.params.id, (err, result) => {
+  Restaurant.findById(req.params.id).populate('reviews').exec((err, result) => {
     if(err) {
       console.log(err);
     } else {
       //res.send(result);
-      //console.log(result.name);
-      res.render('restaurants/show', {allRestaurants: result, currentUser: req.user});
-      //res.render('home', {currentUser: req.user});
+      console.log(result.reviews);
+      res.render('restaurants/show', {restaurant: result, currentUser: req.user});
+    }
+  });
+});
+
+app.post('/restaurants/:id/reviews', (req, res) => {
+  Restaurant.findById(req.params.id, (err, restaurant) => {
+    if(err){
+      console.log(err);
+      res.redirect('/restaurants');
+    } else {
+      Review.create(req.body.review, (err, review) => {
+        if(err) {
+          console.log(err);
+        } else {
+          restaurant.reviews.push(review);
+          restaurant.save();
+          res.redirect('/restaurants/' + restaurant._id);
+        }
+      });
     }
   });
 });

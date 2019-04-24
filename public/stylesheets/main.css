@@ -1,5 +1,5 @@
 html { height: 100%; }
-body {
+/* body {
     min-height:100%;
     position:relative;
     padding-bottom:[footer-height]
@@ -8,4 +8,9 @@ body {
     position: absolute;
     left: 0 ; right: 0; bottom: 0;
     height:[footer-height]
+} */
+
+img{
+  max-width: 100%;
+  height: auto;
 }
