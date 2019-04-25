@@ -1,0 +1,11 @@
+<% include ./partials/header %>
+<div class="container">
+  <h1>Your Cart</h1>
+  <ul>
+    <% user.cart.forEach((dish) => { %>
+      <%console.log(dish);%>
+      <li><%= dish.name %>- <strong><%= dish.price%></strong></li>
+    <% });%>
+  </ul>
+</div>
+<% include ./partials/footer %>

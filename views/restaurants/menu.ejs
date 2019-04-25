@@ -3,7 +3,15 @@
     <h1>Menu</h1>
     <ul>
       <% restaurant.menu.forEach((dish) => { %>
-        <li> <%= dish.name %> - <strong> <%= dish.price%> INR.</strong></li>
+        <li>
+          <%= dish.name %> - <strong> <%= dish.price%> INR.</strong>
+          <form class="" action="/restaurants/:id/menu/addtocart" method="post">
+            <input type="hidden" name="dish[name]" value="<%=dish.name%>">
+            <input type="hidden" name="dish[price]" value="<%=dish.price%>">
+            <input type="hidden" name="dish[img]" value="<%=dish.img%>">
+            <button type="submit" name="dish" value=dish"">Add to cart</button>
+          </form>
+        </li>
       <% }); %>
     </ul>
   </div>

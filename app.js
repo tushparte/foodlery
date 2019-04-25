@@ -66,6 +66,18 @@ app.get('/myprofile', (req, res) => {
   res.render('myprofile', {currentUser: req.user});
 });
 
+app.get('/myprofile/cart', (req, res) => {
+  //res.render('cart', {currentUser: req.user});
+  //console.log(req.user);
+  User.findById(req.user._id).populate('cart').exec((err, result) => {
+    if(err) {
+      console.log(err);
+    } else {
+      res.render('cart', {user: result, currentUser: req.user});
+    }
+  });
+});
+
 app.get('/secret', ensureAuthenticated, (req, res) => {
   res.render('secret', {currentUser: req.user});
 });
@@ -312,18 +324,37 @@ app.post('/restaurants/:id/menu/add', ensureAuthenticated, (req, res) => {
       console.log(err);
       res.redirect('/restaurants');
     } else {
-      Dish.create(req.body.dish, (err, review) => {
+      Dish.create(req.body.dish, (err, dish) => {
         if(err) {
           console.log(err);
         } else {
-          restaurant.menu.push(review);
+          restaurant.menu.push(dish);
           restaurant.save();
-          console.log(review);
           res.redirect('/myrestaurant');
         }
       });
     }
   });
+});
+
+app.post('/restaurants/:id/menu/addtocart', ensureAuthenticated, (req, res) => {
+  User.findById(req.user._id, (err, user) => {
+    if(err) {
+      console.log(err);
+      res.redirect('/restaurants');
+    } else {
+      console.log(req.body.dish);
+      Dish.create(req.body.dish, (err, dish) => {
+        if(err) {
+          console.log(err);
+        } else {
+          user.cart.push(dish);
+          user.save();
+          res.redirect('/');
+        }
+      });
+    }
+  })
 });
 
 app.get('/myrestaurant', restAuthenticate, (req, res) => {
@@ -335,7 +366,7 @@ app.get('/editprofile', restAuthenticate, (req, res) => {
   Restaurant.findById(req.user._id).populate('menu').exec((err, result) => {
     if(err) {
       console.log(err);
-    } else { 
+    } else {
       res.render('restaurants/editform', {restaurant: result, currentUser: req.user});
     }
   });
