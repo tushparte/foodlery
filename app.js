@@ -8,6 +8,7 @@ const bcrypt = require('bcryptjs');
 const User = require('./models/User');
 const Restaurant = require('./models/restaurant')
 const Review = require('./models/review');
+const Dish = require('./models/dish');
 const { ensureAuthenticated, forwardAuthenticated, restAuthenticate} = require('./config/auth');
 
 
@@ -267,8 +268,6 @@ app.get('/restaurants/:id', (req, res) => {
     if(err) {
       console.log(err);
     } else {
-      //res.send(result);
-      console.log(result.reviews);
       res.render('restaurants/show', {restaurant: result, currentUser: req.user});
     }
   });
@@ -289,8 +288,38 @@ app.post('/restaurants/:id/reviews', ensureAuthenticated, (req, res) => {
           review.save();
           restaurant.reviews.push(review);
           restaurant.save();
-          console.log(review);
           res.redirect('/restaurants/' + restaurant._id);
+        }
+      });
+    }
+  });
+});
+
+app.get('/restaurants/:id/menu', (req, res) => {
+  Restaurant.findById(req.params.id).populate('menu').exec((err, result) => {
+    if(err) {
+      console.log(err);
+    } else {
+      res.render('restaurants/menu', {restaurant: result, currentUser: req.user});
+    }
+  });
+});
+
+//add more dishes
+app.post('/restaurants/:id/menu/add', ensureAuthenticated, (req, res) => {
+  Restaurant.findById(req.params.id, (err, restaurant) => {
+    if(err){
+      console.log(err);
+      res.redirect('/restaurants');
+    } else {
+      Dish.create(req.body.dish, (err, review) => {
+        if(err) {
+          console.log(err);
+        } else {
+          restaurant.menu.push(review);
+          restaurant.save();
+          console.log(review);
+          res.redirect('/myrestaurant');
         }
       });
     }
@@ -302,7 +331,14 @@ app.get('/myrestaurant', restAuthenticate, (req, res) => {
 });
 
 app.get('/editprofile', restAuthenticate, (req, res) => {
-  res.render('restaurants/editform', {currentUser: req.user});
+  //console.log(req.user);
+  Restaurant.findById(req.user._id).populate('menu').exec((err, result) => {
+    if(err) {
+      console.log(err);
+    } else { 
+      res.render('restaurants/editform', {restaurant: result, currentUser: req.user});
+    }
+  });
 });
 
 // Logout

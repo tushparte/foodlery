@@ -1,0 +1,10 @@
+<% include ../partials/header %>
+  <div class="container">
+    <h1>Menu</h1>
+    <ul>
+      <% restaurant.menu.forEach((dish) => { %>
+        <li> <%= dish.name %> - <strong> <%= dish.price%> INR.</strong></li>
+      <% }); %>
+    </ul>
+  </div>
+<% include ../partials/footer %>
