@@ -3,9 +3,9 @@
   <h1>Your Cart</h1>
   <ul>
     <% user.cart.forEach((dish) => { %>
-      <%console.log(dish);%>
       <li><%= dish.name %>- <strong><%= dish.price%></strong></li>
     <% });%>
   </ul>
+  <h5><a href="/myprofile/cart/checkout" class="btn btn-success">Checkout</a></h5>
 </div>
 <% include ./partials/footer %>

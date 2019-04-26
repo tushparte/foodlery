@@ -9,6 +9,7 @@ const User = require('./models/User');
 const Restaurant = require('./models/restaurant')
 const Review = require('./models/review');
 const Dish = require('./models/dish');
+const Order = require('./models/order');
 const { ensureAuthenticated, forwardAuthenticated, restAuthenticate} = require('./config/auth');
 
 
@@ -67,8 +68,6 @@ app.get('/myprofile', (req, res) => {
 });
 
 app.get('/myprofile/cart', (req, res) => {
-  //res.render('cart', {currentUser: req.user});
-  //console.log(req.user);
   User.findById(req.user._id).populate('cart').exec((err, result) => {
     if(err) {
       console.log(err);
@@ -76,6 +75,64 @@ app.get('/myprofile/cart', (req, res) => {
       res.render('cart', {user: result, currentUser: req.user});
     }
   });
+});
+
+app.get('/myprofile/cart/checkout', (req, res) => {
+  User.findById(req.user._id).populate('cart').exec((err, result) => {
+    if(err) {
+      console.log(err);
+    } else {
+      res.render('checkout', {user: result, currentUser: req.user});
+    }
+  });
+});
+
+app.post('/myprofile/cart/checkout', (req, res) => {
+  let user = req.user;
+  Order.create(req.body.order, (err, order) => {
+    if(err) {
+      //console.log(err);
+      res.redirect('/myprofile/cart');
+    } else {
+      //console.log(order);
+      order.placedby = user;
+      order.dishes = user.cart;
+      Dish.findById(order.dishes[0], (err, dish) => {
+        if(err) {
+          console.log(err);
+        } else {
+          order.orderedfrom = dish.from.id;
+        }
+      });
+      console.log(order);
+      //order.orderedfrom = order.dishes[0].from;
+      //order.save();
+      user.orders.push(order);
+      //user.save();
+
+      // restaurant.orders.push(order);
+      // restaurant.save();
+      res.redirect('/myprofile');
+    }
+  });
+  // let user = req.user;
+  // Dish.create(req.body.dish, (err, dish) => {
+  //   if(err) {
+  //     console.log(err);
+  //   } else {
+  //     Restaurant.findById(req.params._id, (err, restaurant) => {
+  //       if(err){
+  //         console.log(err);
+  //       } else {
+  //         dish.from = restaurant;
+  //         dish.save();
+  //         user.cart.push(dish);
+  //         user.save();
+  //         res.redirect('/myprofile/cart');
+  //       }
+  //     });
+  //   }
+  // });
 });
 
 app.get('/secret', ensureAuthenticated, (req, res) => {
@@ -319,42 +376,33 @@ app.get('/restaurants/:id/menu', (req, res) => {
 
 //add more dishes
 app.post('/restaurants/:id/menu/add', ensureAuthenticated, (req, res) => {
-  Restaurant.findById(req.params.id, (err, restaurant) => {
-    if(err){
+  let restaurant = req.user;
+  Dish.create(req.body.dish, (err, dish) => {
+    if(err) {
       console.log(err);
-      res.redirect('/restaurants');
     } else {
-      Dish.create(req.body.dish, (err, dish) => {
-        if(err) {
-          console.log(err);
-        } else {
-          restaurant.menu.push(dish);
-          restaurant.save();
-          res.redirect('/myrestaurant');
-        }
-      });
+      dish.from.id = restaurant._id;
+      dish.save();
+      restaurant.menu.push(dish);
+      restaurant.save();
+      res.redirect('/myrestaurant');
     }
   });
 });
 
 app.post('/restaurants/:id/menu/addtocart', ensureAuthenticated, (req, res) => {
-  User.findById(req.user._id, (err, user) => {
+  let user = req.user;
+  Dish.create(req.body.dish, (err, dish) => {
     if(err) {
       console.log(err);
-      res.redirect('/restaurants');
     } else {
-      console.log(req.body.dish);
-      Dish.create(req.body.dish, (err, dish) => {
-        if(err) {
-          console.log(err);
-        } else {
-          user.cart.push(dish);
-          user.save();
-          res.redirect('/');
-        }
-      });
+      dish.from.id = req.params._id;
+      dish.save();
+      user.cart.push(dish);
+      user.save();
+      res.redirect('/myprofile/cart');
     }
-  })
+  });
 });
 
 app.get('/myrestaurant', restAuthenticate, (req, res) => {
@@ -362,7 +410,6 @@ app.get('/myrestaurant', restAuthenticate, (req, res) => {
 });
 
 app.get('/editprofile', restAuthenticate, (req, res) => {
-  //console.log(req.user);
   Restaurant.findById(req.user._id).populate('menu').exec((err, result) => {
     if(err) {
       console.log(err);

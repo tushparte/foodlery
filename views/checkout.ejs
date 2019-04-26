@@ -1,0 +1,21 @@
+<% include ./partials/header %>
+  <div class="container">
+    <h1>Your Cart</h1>
+    <ul>
+      <% var total = 0 %>
+      <% user.cart.forEach((dish) => { %>
+        <% total += dish.price %>
+        <li><%= dish.name %>- <strong><%= dish.price%></strong></li>
+      <% });%>
+    </ul>
+    <h4><strong>Total: <%= total %></strong></h4>
+    <form class="" action="/myprofile/cart/checkout" method="post">
+      <div class="form-group">
+          <label for="address">Address</label>
+          <input  id="address" class="form-control" type="text" name="order[address]" placeholder="Enter Address">
+      </div>
+      <input type="hidden" name="order[total]" value="<%= total %>">
+      <input type="submit" name="submit" value="Place Order" class="btn btn-success">
+    </form>
+  </div>
+<% include ./partials/footer %>
