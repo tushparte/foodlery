@@ -64,7 +64,7 @@ app.use(function(req, res, next) {
 // Welcome Page
 app.get('/', (req, res) => res.render('home', {currentUser: req.user}));
 
-app.get('/myprofile', (req, res) => {
+app.get('/myprofile', ensureAuthenticated,(req, res) => {
   res.render('myprofile', {currentUser: req.user});
 });
 
@@ -78,7 +78,7 @@ app.get('/myprofile/cart', (req, res) => {
   });
 });
 
-app.post('/myprofile/cart/remove', (req, res) => {
+app.post('/myprofile/cart/remove', ensureAuthenticated, (req, res) => {
   User.findById(req.body.userid, (err, user) => {
     if(err) {
       console.log(err);
@@ -90,7 +90,7 @@ app.post('/myprofile/cart/remove', (req, res) => {
   })
 });
 
-app.get('/myprofile/cart/checkout', (req, res) => {
+app.get('/myprofile/cart/checkout', ensureAuthenticated, (req, res) => {
   User.findById(req.user._id).populate('cart').exec((err, result) => {
     if(err) {
       console.log(err);
@@ -100,7 +100,7 @@ app.get('/myprofile/cart/checkout', (req, res) => {
   });
 });
 
-app.post('/myprofile/cart/checkout', (req, res) => {
+app.post('/myprofile/cart/checkout', ensureAuthenticated, (req, res) => {
   let user = req.user;
   Order.create(req.body.order, (err, order) => {
     if(err) {
@@ -442,7 +442,7 @@ app.get('/myrestaurant/orders', restAuthenticate,(req, res) => {
   });
 });
 
-app.post('/myrestaurant/orders/dispatch', (req, res) => {
+app.post('/myrestaurant/orders/dispatch', restAuthenticate, (req, res) => {
   Order.findById(req.body.orderid, (err, order) => {
     if(err) {
       console.log(err);
@@ -463,7 +463,7 @@ app.post('/myrestaurant/orders/dispatch', (req, res) => {
   });
 });
 
-app.post('/myrestaurant/orders/dispatch/assign', (req, res) => {
+app.post('/myrestaurant/orders/dispatch/assign', restAuthenticate,(req, res) => {
   console.log(req.body);
   Valet.findById(req.body.valetid, (err, valet) => {
     if(err) {
@@ -490,7 +490,7 @@ app.get('/myrestaurant/addvalet', restAuthenticate, (req, res) => {
   res.render('restaurants/addvalet', {currentUser: req.user});
 });
 
-app.post('/myrestaurant/addvalet', (req, res) => {
+app.post('/myrestaurant/addvalet', restAuthenticate,(req, res) => {
   const { name, email, password, password2, contact} = req.body;
   let errors = [];
 
@@ -586,7 +586,7 @@ app.get('/valet/dashboard', ensureAuthenticated, (req, res) => {
   });
 });
 
-app.post('/valet/dashboard/delivered', (req, res) => {
+app.post('/valet/dashboard/delivered', ensureAuthenticated,(req, res) => {
   Order.findById(req.body.orderid, (err, order) => {
     if(err) {
       console.log(err);
