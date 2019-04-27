@@ -91,48 +91,35 @@ app.post('/myprofile/cart/checkout', (req, res) => {
   let user = req.user;
   Order.create(req.body.order, (err, order) => {
     if(err) {
-      //console.log(err);
       res.redirect('/myprofile/cart');
     } else {
-      //console.log(order);
       order.placedby = user;
       order.dishes = user.cart;
       Dish.findById(order.dishes[0], (err, dish) => {
         if(err) {
           console.log(err);
+          res.redirect('/myprofile/cart');
         } else {
-          order.orderedfrom = dish.from.id;
+          order.orderedfrom.id = dish.from.id;
+          //working fine till here
+          user.orders.push(order);
+          user.cart = [];
+          order.save();
+          user.save();
+          Restaurant.findById(order.orderedfrom.id, (err, restaurant) => {
+            if(err) {
+              console.log(err);
+              res.redirect('/cart');
+            } else {
+              restaurant.orders.push(order);
+              restaurant.save();
+              res.redirect('/myprofile');
+            }
+          });
         }
       });
-      console.log(order);
-      //order.orderedfrom = order.dishes[0].from;
-      //order.save();
-      user.orders.push(order);
-      //user.save();
-
-      // restaurant.orders.push(order);
-      // restaurant.save();
-      res.redirect('/myprofile');
     }
   });
-  // let user = req.user;
-  // Dish.create(req.body.dish, (err, dish) => {
-  //   if(err) {
-  //     console.log(err);
-  //   } else {
-  //     Restaurant.findById(req.params._id, (err, restaurant) => {
-  //       if(err){
-  //         console.log(err);
-  //       } else {
-  //         dish.from = restaurant;
-  //         dish.save();
-  //         user.cart.push(dish);
-  //         user.save();
-  //         res.redirect('/myprofile/cart');
-  //       }
-  //     });
-  //   }
-  // });
 });
 
 app.get('/secret', ensureAuthenticated, (req, res) => {
@@ -392,17 +379,16 @@ app.post('/restaurants/:id/menu/add', ensureAuthenticated, (req, res) => {
 
 app.post('/restaurants/:id/menu/addtocart', ensureAuthenticated, (req, res) => {
   let user = req.user;
-  Dish.create(req.body.dish, (err, dish) => {
+  Dish.findById(req.body.dish, (err, dish) => {
     if(err) {
       console.log(err);
+      res.redirect('/');
     } else {
-      dish.from.id = req.params._id;
-      dish.save();
       user.cart.push(dish);
       user.save();
       res.redirect('/myprofile/cart');
     }
-  });
+  })
 });
 
 app.get('/myrestaurant', restAuthenticate, (req, res) => {
