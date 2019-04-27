@@ -20,9 +20,13 @@ const ValetSchema = new mongoose.Schema({
   orders: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'order'
+      ref: 'Order'
     }
-  ]
+  ],
+  home : {
+    type: String,
+    default: '/valet/dashboard'
+  }
 });
 
 const Valet = mongoose.model('Valet', ValetSchema);

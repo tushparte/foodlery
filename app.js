@@ -388,7 +388,7 @@ app.post('/restaurants/:id/menu/addtocart', ensureAuthenticated, (req, res) => {
     } else {
       user.cart.push(dish);
       user.save();
-      res.redirect('/myprofile/cart');
+      res.redirect('/restaurants/'+dish.from.id+'/menu');
     }
   })
 });
@@ -405,6 +405,73 @@ app.get('/editprofile', restAuthenticate, (req, res) => {
       res.render('restaurants/editform', {restaurant: result, currentUser: req.user});
     }
   });
+});
+
+app.get('/myrestaurant/orders', restAuthenticate,(req, res) => {
+  Restaurant.findById(req.user._id).populate({
+    path: 'orders',
+    populate: [
+      {
+        path: 'dishes',
+        model: 'Dish'
+      },
+      {
+        path: 'placedby',
+        model: 'User'
+      }
+    ]
+  }).exec((err, restaurant) => {
+    if(err){
+      console.log(err);
+    } else {
+      //res.send(restaurant.orders);
+      res.render('restaurants/orders', {restaurant: restaurant, currentUser: req.user});
+    }
+  });
+});
+
+app.post('/myrestaurant/orders/dispatch', (req, res) => {
+  Order.findById(req.body.orderid, (err, order) => {
+    if(err) {
+      console.log(err);
+    } else {
+      Valet.find({}, (err, valets) => {
+        if(err) {
+          console.log(err);
+        } else {
+           res.render('restaurants/dispatch', {
+             currentUser: req.user,
+             order,
+             valets,
+             orderid: req.body.orderid
+           });
+        }
+      });
+    }
+  });
+});
+
+app.post('/myrestaurant/orders/dispatch/assign', (req, res) => {
+  console.log(req.body);
+  Valet.findById(req.body.valetid, (err, valet) => {
+    if(err) {
+      console.log(err);
+    } else {
+      Order.findById(req.body.orderid, (err, order) => {
+        if(err) {
+          console.log(err);
+        } else {
+          order.status = "Dispatched";
+          valet.orders.push(order);
+        //  console.log(valet);
+          order.save();
+          valet.save();
+          res.redirect('/myrestaurant/orders');
+        }
+      });
+    }
+  });
+  //res.send("assigned");
 });
 
 app.get('/myrestaurant/addvalet', restAuthenticate, (req, res) => {
@@ -485,7 +552,38 @@ app.get('/valetlogin', (req, res) => {
 });
 
 app.get('/valet/dashboard', ensureAuthenticated, (req, res) => {
-  res.render('valet/dashboard');
+  Valet.findById(req.user._id).populate({
+    path: 'orders',
+    populate : [
+      {
+        path: 'placedby',
+        model: 'User'
+      },
+      {
+        path: 'orderedfrom',
+        model: 'Restaurant'
+      }
+    ]
+  }
+  ).exec((err, valet) => {
+    if (err) {
+      console.log(err);
+    } else {
+      res.render('valet/dashboard',{currentUser: valet, valet});
+    }
+  });
+});
+
+app.post('/valet/dashboard/delivered', (req, res) => {
+  Order.findById(req.body.orderid, (err, order) => {
+    if(err) {
+      console.log(err);
+    } else {
+      order.status = "Delivered";
+      order.save();
+      res.redirect('/valet/dashboard');
+    }
+  });
 });
 
 app.post('/valetlogin', (req, res, next) => {

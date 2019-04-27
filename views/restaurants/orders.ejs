@@ -1,0 +1,26 @@
+<% include ../partials/header %>
+  <div class="container">
+    <h1>Orders</h1>
+    <ol>
+      <% restaurant.orders.forEach((order) => { %>
+        <%if(order.status==="Placed"){%>
+          <h5><strong>ID: <%= order._id%></strong></h5>
+          <h6><strong>Dishes</strong></h6>
+          <ul>
+            <% order.dishes.forEach((dish) => { %>
+            <li>
+              <%= dish.name %> - <strong> <%= dish.price%> INR.</strong>
+            </li>
+            <% }); %>
+          </ul>
+          <h6><strong>Status: </strong> <%= order.status %></h6>
+          <h6><strong>Address: </strong> <%=order.address%></h6>
+          <form class="" action="/myrestaurant/orders/dispatch" method="post">
+            <input type="hidden" name="orderid" value="<%=order._id%>">
+            <button type="submit" class="btn btn-success" >Dispatch</button>
+          </form>
+        <%}%>
+      <% }); %>
+    </ol>
+  </div>
+<% include ../partials/footer %>

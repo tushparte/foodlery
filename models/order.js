@@ -3,12 +3,12 @@ const mongoose = require('mongoose');
 const orderSchema = new mongoose.Schema({
   placedby : {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'user'
+    ref: 'User'
   },
   dishes: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'dish'
+      ref: 'Dish'
     }
   ],
   total: Number,

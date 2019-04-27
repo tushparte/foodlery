@@ -1,11 +1,22 @@
 <% include ../partials/header %>
 <div class="container">
-  <h1>Your Cart</h1>
-  <ul>
-    <% user.orders.forEach((order) => { %>
-      <li><%= 1. %>- <strong><%= order.address %></strong></li>
+  <h1>To be Delivered</h1>
+  <ol>
+    <% valet.orders.forEach((order) => { %>
+      <% if(order.status!="Delivered"){ %>
+        <li>
+          <strong>ID: </strong> <%= order._id %>
+          <br>
+          <strong>Name : </strong> <%=order.placedby.name %>
+          <br>
+          <strong>Address : </strong> <%=order.address%>
+          <form class="" action="/valet/dashboard/delivered" method="post">
+            <input type="hidden" name="orderid" value="<%= order._id%>">
+            <input type="submit" name="delivered" value="Delivered" class="btn btn-sm btn-success">
+          </form>
+        </li>
+      <% } %>
     <% });%>
-  </ul>
-  <h5><a href="/myprofile/cart/checkout" class="btn btn-success">Checkout</a></h5>
+  </ol>
 </div>
 <% include ../partials/footer %>

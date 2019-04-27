@@ -1,0 +1,16 @@
+<% include ../partials/header %>
+  <div class="container">
+    <h1>Valets</h1>
+    <ul>
+      <% valets.forEach((valet) => { %>
+        <h5><strong>Name :</strong> <%= valet.name %> </h5>
+        <h5><strong>Orders :</strong> <%= valet.orders.length%></h5>
+        <form class="" action="/myrestaurant/orders/dispatch/assign" method="post">
+          <input type="hidden" name="orderid" value="<%= orderid %>">
+          <input type="hidden" name="valetid" value="<%= valet._id %>">
+          <input type="submit" name="order" value="Assign" class="btn btn-success">
+        </form>
+      <% }); %>
+    </ul>
+  </div>
+<% include ../partials/footer %>

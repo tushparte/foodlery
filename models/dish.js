@@ -7,8 +7,12 @@ const dishSchema = new mongoose.Schema({
   from: {
     id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'restaurant'
+      ref: 'Restaurant'
     }
+  },
+  account : {
+    type: String,
+    default: 'dish'
   }
 });
 

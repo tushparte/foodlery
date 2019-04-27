@@ -7,7 +7,7 @@
           <%= dish.name %> - <strong> <%= dish.price%> INR.</strong>
           <form class="" action="/restaurants/:id/menu/addtocart" method="post">
             <input type="hidden" name="dish" value="<%=dish._id%>">
-            <button type="submit" >Add to cart</button>
+            <button type="submit" class="btn btn-sm btn-success" >Add to cart</button>
           </form>
         </li>
       <% }); %>

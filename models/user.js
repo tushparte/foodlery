@@ -34,9 +34,13 @@ const UserSchema = new mongoose.Schema({
   orders: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'order'
+      ref: 'Order'
     }
-  ]
+  ],
+  home : {
+    type: String,
+    default: '/myprofile'
+  }
 });
 
 const User = mongoose.model('User', UserSchema);

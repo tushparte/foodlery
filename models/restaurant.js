@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+//const order = require('./order');
 
 const RestaurantSchema = new mongoose.Schema({
   name: {
@@ -42,9 +43,13 @@ const RestaurantSchema = new mongoose.Schema({
   orders: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'order'
+      ref: 'Order'
     }
-  ]
+  ],
+  home : {
+    type: String,
+    default: '/myrestaurant'
+  }
 });
 
 const Restaurant = mongoose.model('Restaurant', RestaurantSchema);
