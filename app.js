@@ -78,6 +78,18 @@ app.get('/myprofile/cart', (req, res) => {
   });
 });
 
+app.post('/myprofile/cart/remove', (req, res) => {
+  User.findById(req.body.userid, (err, user) => {
+    if(err) {
+      console.log(err);
+    } else {
+      user.cart = user.cart.filter((dish) => dish._id != req.body.dishid);
+      user.save();
+      res.redirect('/myprofile/cart');
+    }
+  })
+});
+
 app.get('/myprofile/cart/checkout', (req, res) => {
   User.findById(req.user._id).populate('cart').exec((err, result) => {
     if(err) {

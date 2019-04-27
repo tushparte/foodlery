@@ -4,6 +4,11 @@
   <ul>
     <% user.cart.forEach((dish) => { %>
       <li><%= dish.name %>- <strong><%= dish.price%></strong></li>
+      <form class="" action="/myprofile/cart/remove" method="post">
+        <input type="hidden" name="dishid" value="<%= dish._id %>">
+        <input type="hidden" name="userid" value="<%= user._id %>">
+        <input type="submit" name="remove" value="Remove" class="btn btn-sm btn-danger">
+      </form>
     <% });%>
   </ul>
   <h5><a href="/myprofile/cart/checkout" class="btn btn-success">Checkout</a></h5>
