@@ -1,0 +1,11 @@
+<% include ../partials/header %>
+<div class="container">
+  <h1>Your Cart</h1>
+  <ul>
+    <% user.orders.forEach((order) => { %>
+      <li><%= 1. %>- <strong><%= order.address %></strong></li>
+    <% });%>
+  </ul>
+  <h5><a href="/myprofile/cart/checkout" class="btn btn-success">Checkout</a></h5>
+</div>
+<% include ../partials/footer %>

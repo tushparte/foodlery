@@ -1,0 +1,32 @@
+<% include ../partials/header %>
+<div class="container">
+    <h1>Add Valet</h1>
+</div>
+<div class="page-wrap container">
+    <% include ../partials/messages %>
+    <form action="/myrestaurant/addvalet" method="POST">
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input  id="name" class="form-control" type="text" name="name" placeholder="Enter Name">
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input id="email" class="form-control" type="text" name="email" placeholder="Enter Email">
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input id="password" class="form-control" type="password" name="password" placeholder="Enter Password">
+        </div>
+        <div class="form-group">
+            <label for="password2">Password</label>
+            <input id="password2" class="form-control" type="password" name="password2" placeholder="Confirm Password">
+        </div>
+        <div class="form-group">
+            <label for="contact">Phone Number</label>
+            <input id="contact" class="form-control" type="text" name="contact" placeholder="Enter Phone Number">
+        </div>
+        <br>
+        <button class="btn btn-success" type="submit">Submit</button>
+    </form>
+</div>
+<% include ../partials/footer %>

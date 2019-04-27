@@ -10,6 +10,7 @@ const Restaurant = require('./models/restaurant')
 const Review = require('./models/review');
 const Dish = require('./models/dish');
 const Order = require('./models/order');
+const Valet = require('./models/valet');
 const { ensureAuthenticated, forwardAuthenticated, restAuthenticate} = require('./config/auth');
 
 
@@ -95,6 +96,7 @@ app.post('/myprofile/cart/checkout', (req, res) => {
     } else {
       order.placedby = user;
       order.dishes = user.cart;
+      order.status = "Placed";
       Dish.findById(order.dishes[0], (err, dish) => {
         if(err) {
           console.log(err);
@@ -405,6 +407,94 @@ app.get('/editprofile', restAuthenticate, (req, res) => {
   });
 });
 
+app.get('/myrestaurant/addvalet', restAuthenticate, (req, res) => {
+  res.render('restaurants/addvalet', {currentUser: req.user});
+});
+
+app.post('/myrestaurant/addvalet', (req, res) => {
+  const { name, email, password, password2, contact} = req.body;
+  let errors = [];
+
+  if (!name || !email || !password || !password2) {
+    errors.push({ msg: 'Please enter all fields' });
+  }
+
+  if (password != password2) {
+    errors.push({ msg: 'Passwords do not match' });
+  }
+
+  if (password.length < 6) {
+    errors.push({ msg: 'Password must be at least 6 characters' });
+  }
+
+  if (errors.length > 0) {
+    console.log(errors);
+    res.render('registerrestaurant', {
+      errors,
+      name,
+      email,
+      password,
+      password2,
+      contact,
+      currentUser: req.user
+    });
+  } else {
+    Valet.findOne({ email: email }).then(valet => {
+      if (valet) {
+        errors.push({ msg: 'Email already exists' });
+        res.render('register', {
+          errors,
+          name,
+          email,
+          password,
+          password2,
+          contact,
+        });
+      } else {
+        const newValet = new Valet({
+          name,
+          email,
+          password,
+          contact,
+        });
+
+        bcrypt.genSalt(10, (err, salt) => {
+          bcrypt.hash(newValet.password, salt, (err, hash) => {
+            if (err) throw err;
+            newValet.password = hash;
+            newValet
+              .save()
+              .then(user => {
+                req.flash(
+                  'success_msg',
+                  'Valet is now registered and can log in'
+                );
+                //console.log(newValet);
+                res.redirect('/valetlogin');
+              })
+              .catch(err => console.log(err));
+          });
+        });
+      }
+    });
+  }
+});
+
+app.get('/valetlogin', (req, res) => {
+  res.render('valet/valetlogin', {currentUser: req.user});
+});
+
+app.get('/valet/dashboard', ensureAuthenticated, (req, res) => {
+  res.render('valet/dashboard');
+});
+
+app.post('/valetlogin', (req, res, next) => {
+  passport.authenticate('valet-local', {
+    successRedirect: '/valet/dashboard',
+    failureRedirect: '/valetlogin',
+    failureFlash: true
+  })(req, res, next);
+});
 // Logout
 app.get('/logout', (req, res) => {
   req.logout();

@@ -18,7 +18,8 @@ const orderSchema = new mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Restaurant'
     }
-  }
+  },
+  status: String
 });
 
 module.exports = mongoose.model('Order', orderSchema);
